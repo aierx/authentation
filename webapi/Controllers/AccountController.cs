@@ -2,21 +2,18 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using webapi.model.po;
 using webapi.model.vo;
 
 namespace webapi.Controllers;
 
-
 [Route("account")]
 [EnableCors("aaa")]
-
-public class AccountController :Controller
+// [MinimumAgeAuthorize(10)]
+public class AccountController : Controller
 {
-
-    private AppDbContext _db;
+    private readonly AppDbContext _db;
 
     public AccountController(AppDbContext db)
     {
@@ -29,25 +26,25 @@ public class AccountController :Controller
     {
         var loginVoInDb = (from userPo in _db.User
             where userPo.name == userLoginVo.Name
-            select new UserLoginVo() { Name = userPo.name, Passwd = userPo.passwd }).FirstOrDefault();;
-        if (loginVoInDb==null || loginVoInDb.Passwd!=userLoginVo.Passwd)
+            select new UserLoginVo { Name = userPo.name, Passwd = userPo.passwd }).FirstOrDefault();
+        ;
+        if (loginVoInDb == null || loginVoInDb.Passwd != userLoginVo.Passwd) return Results.BadRequest("用户不存在或密码错误");
+
+        var po = _db.User.Where(e => e.name == userLoginVo.Name).Include(e => e.RolePos)
+            .ThenInclude(e => e.PermissionPos).First();
+        var identity = new ClaimsIdentity("Basic");
+        foreach (RolePo rolePo in po.RolePos)
         {
-           
-            return  Results.BadRequest("用户不存在或密码错误");
+            identity.AddClaim(new("Role",rolePo.name));            
         }
-
-        UserPo po = _db.User.Where(e => e.name == userLoginVo.Name).Include(e => e.RolePos).ThenInclude(e => e.PermissionPos).First();
-
-        var claimsIdentity = new ClaimsIdentity(new Claim[] { new Claim("Role", Json(po).ToString()!)}, "Basic");
-        HttpContext.SignInAsync(new ClaimsPrincipal(claimsIdentity));
+        HttpContext.SignInAsync(new ClaimsPrincipal(identity));
         return Results.Ok("登入成功");
     }
-    
+
     [HttpPost("logout")]
     public IResult logout()
     {
         HttpContext.SignOutAsync();
         return Results.Ok("退出登入");
     }
-    
 }

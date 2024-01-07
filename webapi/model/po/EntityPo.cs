@@ -6,15 +6,11 @@ public class EntityPo
 {
     public long Id { get; set; }
 
-    [JsonIgnore]
-    public DateTime CreateTime { get; set; }
-    
-    [JsonIgnore]
-    public DateTime ModifyTime { get; set; }
-    
-    [JsonIgnore]
-    public string? Creator { get; set; }
-    
-    [JsonIgnore]
-    public string? modifer { get; set; }
+    [JsonIgnore] public DateTime CreateTime { get; set; }
+
+    [JsonIgnore] public DateTime ModifyTime { get; set; }
+
+    [JsonIgnore] public string? Creator { get; set; }
+
+    [JsonIgnore] public string? modifer { get; set; }
 }

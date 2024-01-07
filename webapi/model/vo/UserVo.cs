@@ -3,8 +3,7 @@
 public class UserVo
 {
     public long Id { set; get; }
-    public string Name{ get; set; }
-    
-    public List<RoleVo> RoleVos { get; set; }
+    public string Name { get; set; }
 
+    public List<string> RoleVos { get; set; }
 }

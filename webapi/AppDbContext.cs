@@ -5,15 +5,14 @@ namespace webapi;
 
 public class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
+
     public DbSet<ResourcePo> Resource { set; get; }
     public DbSet<RolePo> Role { set; get; }
     public DbSet<UserPo> User { set; get; }
     public DbSet<PermissionPo> Permission { set; get; }
-
-    public AppDbContext(DbContextOptions<AppDbContext> options):base(options)
-    {
-        
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,7 +45,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ResourcePo>().HasMany<RolePo>(e => e.RolePos).WithOne();
         modelBuilder.Entity<RolePo>().HasMany<UserPo>(e => e.UserPos).WithMany(e => e.RolePos)
             .UsingEntity(e => e.ToTable("t_role_user"));
-        modelBuilder.Entity<RolePo>().HasMany<PermissionPo>(e=>e.PermissionPos).WithMany(e => e.RolePos)
+        modelBuilder.Entity<RolePo>().HasMany<PermissionPo>(e => e.PermissionPos).WithMany(e => e.RolePos)
             .UsingEntity(e => e.ToTable("t_role_permission"));
     }
 }
