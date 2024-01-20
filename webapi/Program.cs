@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using webapi.Middleware;
 using webapi.provider;
 
@@ -10,6 +11,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
@@ -17,13 +19,16 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(e =>
+        {
+            e.CustomSchemaIds(type => type.FullName);
+        });
 
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("aaa", builder =>
             {
-                builder.WithOrigins("http://aierx.com:5173", "http://192.168.3.169:5173", "http://localhost:5173")
+                builder.WithOrigins("http://127.0.0.1", "http://localhost")
                     .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                 ;
             });
@@ -46,16 +51,18 @@ public class Program
 
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseMySql("Server=localhost;Database=webapi;Uid=root;Pwd=123456;",
+            options.UseMySql("Server=localhost;Database=webapi;Uid=root;Pwd=13638437650.lL;",
                 MySqlServerVersion.LatestSupportedServerVersion);
         });
+        string VirtualPath = "api";
 
-
+        builder.Services.AddScoped<TransferRoute>((e) => { return new TransferRoute(VirtualPath);});
         builder.Services.AddScoped<MyAuthorizationMiddleware>();
 
         var app = builder.Build();
-
         // Configure the HTTP request pipeline.
+        app.UsePathBase(new PathString("/api"));
+
         app.UseSwagger();
         app.UseSwaggerUI();
 
@@ -65,7 +72,6 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseMiddleware<MyAuthorizationMiddleware>();
-
         app.MapControllers();
 
         app.Run();
