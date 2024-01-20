@@ -15,4 +15,12 @@ public class ContentController: Controller
 
     }
     
+    
+    [HttpPost("add1")]
+    public IResult add1()
+    {
+        return Results.Ok( "Hello world");
+
+    }
+    
 }
