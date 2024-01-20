@@ -11,7 +11,7 @@ public class ContentController: Controller
     [HttpPost("add")]
     public IResult add()
     {
-        return Results.Ok();
+        return Results.Ok( "Hello world");
 
     }
     
