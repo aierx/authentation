@@ -17,15 +17,15 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(e => { e.CustomSchemaIds(type => type.FullName); });
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("aaa", builder =>
-            {
-                builder.WithOrigins("http://127.0.0.1", "http://localhost")
-                    .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-                ;
-            });
-        });
+        // builder.Services.AddCors(options =>
+        // {
+        //     options.AddPolicy("aaa", builder =>
+        //     {
+        //         builder.WithOrigins("http://127.0.0.1", "http://localhost")
+        //             .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+        //         ;
+        //     });
+        // });
         // builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
         // builder.Services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
 
@@ -50,21 +50,23 @@ public class Program
         var VirtualPath = "api";
 
         builder.Services.AddScoped<TransferRoute>(e => { return new TransferRoute(VirtualPath); });
-        builder.Services.AddScoped<MyAuthorizationMiddleware>();
+        // builder.Services.AddScoped<MyAuthorizationMiddleware>();
 
         var app = builder.Build();
         // Configure the HTTP request pipeline.
         app.UsePathBase(new PathString("/api"));
+        app.UseRouting();
+        app.UseRouting();
 
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
         app.UseCors();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseMiddleware<MyAuthorizationMiddleware>();
+        // app.UseAuthentication();
+        // app.UseAuthorization();
+        // app.UseMiddleware<MyAuthorizationMiddleware>();
         app.MapControllers();
 
         app.Run();

@@ -2,8 +2,9 @@
 
 public class UserVo
 {
-    public long Id { set; get; }
     public string Name { get; set; }
+    
+    public string Password { get; set; }
 
     public List<string> RoleVos { get; set; }
 }
