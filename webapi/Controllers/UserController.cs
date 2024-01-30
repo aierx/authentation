@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi.model.po;
 using webapi.model.vo;
@@ -48,6 +47,29 @@ public class UserController
         return Results.Ok("添加用户成功");
     }
 
+    [HttpPost("modifyRole")]
+    public IResult ModifyRole([FromBody] ModifyRoleVo modifyRoleVo)
+    {
+        var userPo = _db.User.FirstOrDefault(e => e.name == modifyRoleVo.Name);
+        if (userPo==null)
+        {
+            return Results.Problem("用户不存在");
+        }
+        var rolePos = _db.Role.Where(e => modifyRoleVo.RoleVos.Contains(e.name)).ToList();
+
+        if (rolePos.Count!=modifyRoleVo.RoleVos.Count)
+        {
+            var dbRole = rolePos.Select(e=>e.name).ToList();
+            modifyRoleVo.RoleVos.RemoveAll(e => dbRole.Contains(e));
+            var hint = string.Join(",",modifyRoleVo.RoleVos);
+            return Results.Problem($"以下角色不存在：{hint}");
+        }
+        userPo.RolePos = rolePos;
+        _db.User.Update(userPo);
+        _db.SaveChanges();
+        return Results.Ok("修改用户角色成功");
+    }
+
     [HttpPost("modifyPassWord")]
     public IResult ModifyPassWord([FromBody] ModifyPassWordVO modifyPassWordVo)
     {
@@ -83,29 +105,22 @@ public class UserController
     }
 
     [HttpGet("queryAll")]
-    public List<UserVo> Query()
+    public IResult Query()
     {
-        var userVos = new List<UserVo>();
-        foreach (var userPo in _db.User.Include(po => po.RolePos))
-        {
-            var userVo = new UserVo
-            {
-                Name = userPo.name,
-                RoleVos = userPo.RolePos.Select(e => e.name).ToList()
-            };
-            userVos.Add(userVo);
-        }
-        return userVos;
+        var userVos = _db.User.Include(po => po.RolePos)
+            .Select(userPo => new UserVo { Name = userPo.name, RoleVos = userPo.RolePos.Select(e => e.name).ToList() })
+            .ToList();
+        return Results.Ok(userVos);
     }
 
     [HttpGet("queryByName")]
     public IResult QueryByName([FromQuery] string name)
     {
-        var userVo = (from userPo in _db.User
-                where userPo.name == name
-                select new UserVo { Name = userPo.name })
-            .FirstOrDefault();
-        if (userVo == null) return Results.BadRequest("用户不存在");
-        return Results.Ok(userVo);
+        var userViewVo = _db.User.Where(e => e.name == name).Include(e => e.RolePos).Select(e => new UserViewVO()
+        {
+            Name = e.name,
+            RoleVos = e.RolePos.Select(e => e.name).ToList()
+        }).FirstOrDefault();
+        return userViewVo==null ? Results.Problem("用户不存在") : Results.Ok(userViewVo);
     }
 }
