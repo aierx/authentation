@@ -90,7 +90,7 @@ public class UserController
         return Results.Ok("修改密码成功");
     }
 
-    [HttpPost("/deleteByName")]
+    [HttpPost("deleteByName")]
     public IResult DeleteByName([FromBody] string name)
     {
         var userPo = _db.User.FirstOrDefault(e=>e.name==name);
