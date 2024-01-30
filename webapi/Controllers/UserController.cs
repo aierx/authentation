@@ -21,11 +21,12 @@ public class UserController
     public IResult Add([FromBody] UserVo userVo)
     {
         var userPo = new UserPo { name = userVo.Name };
-        if (userVo.RoleVos.Count!=0)
+        if (userVo.RoleVos.Count != 0)
         {
-           var list = _db.Role.Where(e => userVo.RoleVos.Contains(e.name)).ToList();
-           userPo.RolePos = list;
+            var list = _db.Role.Where(e => userVo.RoleVos.Contains(e.name)).ToList();
+            userPo.RolePos = list;
         }
+
         _db.User.Add(userPo);
         _db.SaveChanges();
         return Results.Ok();
@@ -35,15 +36,13 @@ public class UserController
     public IResult Update([FromBody] UserVo userVo)
     {
         var userPo = _db.User.Where(e => e.name == userVo.Name).Include(e => e.RolePos).FirstOrDefault();
-        if (userPo==null)
-        {
-            return Results.BadRequest("用户不存在");
-        }
-        if (userVo.RoleVos.Count!=0)
+        if (userPo == null) return Results.BadRequest("用户不存在");
+        if (userVo.RoleVos.Count != 0)
         {
             var list = _db.Role.Where(e => userVo.RoleVos.Contains(e.name)).ToList();
             userPo.RolePos = list;
-        }else
+        }
+        else
         {
             return Results.BadRequest("没有改动");
         }
@@ -52,7 +51,7 @@ public class UserController
         _db.SaveChanges();
         return Results.Ok();
     }
-    
+
 
     [HttpGet("query")]
     public List<UserVo> Query()
@@ -68,10 +67,7 @@ public class UserController
                 where userPo.name == name
                 select new UserVo { Name = userPo.name, Id = userPo.Id })
             .FirstOrDefault();
-        if (userVo==null)
-        {
-            return Results.BadRequest("用户不存在");
-        }
+        if (userVo == null) return Results.BadRequest("用户不存在");
         return Results.Ok(userVo);
     }
 }

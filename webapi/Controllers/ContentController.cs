@@ -5,22 +5,26 @@ namespace webapi.Controllers;
 
 [Route("content")]
 [EnableCors("aaa")]
-public class ContentController: Controller
+public class ContentController : Controller
 {
+    private AppDbContext _db;
 
-    [HttpPost("add")]
-    public IResult add()
+    public ContentController(AppDbContext db)
     {
-        return Results.Ok( "Hello world");
-
+        _db = db;
     }
-    
-    
+
+    [HttpPost("save")]
+    public IResult SaveOrUpdate()
+    {
+        // _db.
+        return Results.Ok("Hello world");
+    }
+
+
     [HttpPost("add1")]
     public IResult add1()
     {
-        return Results.Ok( "Hello world");
-
+        return Results.Ok("Hello world");
     }
-    
 }

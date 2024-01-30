@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using webapi.Middleware;
-using webapi.provider;
 
 namespace webapi;
 
@@ -11,7 +8,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
@@ -19,10 +15,7 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(e =>
-        {
-            e.CustomSchemaIds(type => type.FullName);
-        });
+        builder.Services.AddSwaggerGen(e => { e.CustomSchemaIds(type => type.FullName); });
 
         builder.Services.AddCors(options =>
         {
@@ -52,11 +45,11 @@ public class Program
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
             options.UseMySql("Server=localhost;Database=webapi;Uid=root;Pwd=13638437650.lL;",
-                MySqlServerVersion.LatestSupportedServerVersion);
+            new MySqlServerVersion("5.7.44"));
         });
-        string VirtualPath = "api";
+        var VirtualPath = "api";
 
-        builder.Services.AddScoped<TransferRoute>((e) => { return new TransferRoute(VirtualPath);});
+        builder.Services.AddScoped<TransferRoute>(e => { return new TransferRoute(VirtualPath); });
         builder.Services.AddScoped<MyAuthorizationMiddleware>();
 
         var app = builder.Build();

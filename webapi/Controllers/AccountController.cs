@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using webapi.model.po;
 using webapi.model.vo;
 
 namespace webapi.Controllers;
@@ -30,13 +29,9 @@ public class AccountController : Controller
         ;
         if (loginVoInDb == null || loginVoInDb.Passwd != userLoginVo.Passwd) return Results.BadRequest("用户不存在或密码错误");
 
-        var po = _db.User.Where(e => e.name == userLoginVo.Name).Include(e => e.RolePos)
-            .ThenInclude(e => e.PermissionPos).First();
+        var po = _db.User.Where(e => e.name == userLoginVo.Name).Include(e => e.RolePos).First();
         var identity = new ClaimsIdentity("Basic");
-        foreach (RolePo rolePo in po.RolePos)
-        {
-            identity.AddClaim(new("Role",rolePo.name));            
-        }
+        foreach (var rolePo in po.RolePos) identity.AddClaim(new Claim("Role", rolePo.name));
         HttpContext.SignInAsync(new ClaimsPrincipal(identity));
         return Results.Ok("登入成功");
     }

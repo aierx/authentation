@@ -4,5 +4,4 @@ public class RolePo : EntityPo
 {
     public string name { get; set; }
     public List<UserPo> UserPos { get; set; }
-    public List<PermissionPo> PermissionPos { get; set; }
 }
