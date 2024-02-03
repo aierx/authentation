@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi.model.po;
@@ -8,6 +9,7 @@ namespace webapi.Controllers;
 
 [Route("role")]
 [EnableCors("aaa")]
+[Authorize(Roles = "admin")]
 public class RoleController
 {
     private readonly AppDbContext _db;
@@ -18,6 +20,7 @@ public class RoleController
     }
 
     [HttpPost("add")]
+    [Authorize(Roles = "admin")]
     public IResult Add([FromBody] RoleVo roleVo)
     {
         if (_db.Role.Any(e => e.name == roleVo.Name))
@@ -31,6 +34,7 @@ public class RoleController
     }
 
     [HttpPost("deleteByName")]
+    [Authorize(Roles = "admin")]
     public IResult DeleteByName([FromBody] string name)
     {
         var rolePo = _db.Role.FirstOrDefault(e => e.name == name);

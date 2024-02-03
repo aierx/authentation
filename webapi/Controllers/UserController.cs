@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi.model.po;
 using webapi.model.vo;
@@ -7,7 +9,7 @@ using webapi.util;
 namespace webapi.Controllers;
 
 [Route("user")]
-// [EnableCors("aaa")]
+[Authorize]
 public class UserController
 {
     private readonly AppDbContext _db;
@@ -20,25 +22,26 @@ public class UserController
     }
 
     [HttpPost("add")]
-    public IResult Add([FromBody] UserVo userVo)
+    [Authorize(Roles = "admin")]
+    public IResult Add([FromBody] AddUserVo addUserVo)
     {
-        if (_db.User.Any(e => e.name==userVo.Name))
+        if (_db.User.Any(e => e.name==addUserVo.Name))
         {
             return Results.Problem("用户已存在");
         }
 
-        if (userVo.RoleVos.Count != 0 && _db.Role.Count(e => userVo.RoleVos.Contains(e.name)) != userVo.RoleVos.Count())
+        if (addUserVo.RoleVos.Count != 0 && _db.Role.Count(e => addUserVo.RoleVos.Contains(e.name)) != addUserVo.RoleVos.Count())
         {
             return Results.Problem("指定角色不存在");
         }
 
         var salt = hashPassword.GenerateSalt();
-        string hashPassWord = hashPassword.Generate(salt,userVo.Password);
-        var userPo = new UserPo { name = userVo.Name,passwd = hashPassWord,salt = salt};
+        string hashPassWord = hashPassword.Generate(salt,addUserVo.Password);
+        var userPo = new UserPo { name = addUserVo.Name,passwd = hashPassWord,salt = salt};
         
-        if (userVo.RoleVos.Count != 0)
+        if (addUserVo.RoleVos.Count != 0)
         {
-            var list = _db.Role.Where(e => userVo.RoleVos.Contains(e.name)).ToList();
+            var list = _db.Role.Where(e => addUserVo.RoleVos.Contains(e.name)).ToList();
             userPo.RolePos = list;
         }
 
@@ -48,13 +51,15 @@ public class UserController
     }
 
     [HttpPost("modifyRole")]
+    [Authorize(Roles = "admin")]
     public IResult ModifyRole([FromBody] ModifyRoleVo modifyRoleVo)
     {
-        var userPo = _db.User.FirstOrDefault(e => e.name == modifyRoleVo.Name);
+        var userPo = _db.User.Include(e=>e.RolePos).FirstOrDefault(e => e.name == modifyRoleVo.Name);
         if (userPo==null)
         {
             return Results.Problem("用户不存在");
         }
+        
         var rolePos = _db.Role.Where(e => modifyRoleVo.RoleVos.Contains(e.name)).ToList();
 
         if (rolePos.Count!=modifyRoleVo.RoleVos.Count)
@@ -64,12 +69,29 @@ public class UserController
             var hint = string.Join(",",modifyRoleVo.RoleVos);
             return Results.Problem($"以下角色不存在：{hint}");
         }
-        userPo.RolePos = rolePos;
+
+        userPo.RolePos.RemoveAll(_ => true);
+        userPo.RolePos.AddRange(rolePos);
         _db.User.Update(userPo);
         _db.SaveChanges();
         return Results.Ok("修改用户角色成功");
     }
 
+    [HttpPost("deleteByName")]
+    [Authorize(Roles = "admin")]
+    public IResult DeleteByName([FromBody] string name)
+    {
+        var userPo = _db.User.FirstOrDefault(e=>e.name==name);
+        if (userPo==null)
+        {
+            return Results.Problem("用户不存在");
+        }
+
+        _db.User.Remove(userPo);
+        _db.SaveChanges();
+        return Results.Ok("删除用户成功");
+    }
+    
     [HttpPost("modifyPassWord")]
     public IResult ModifyPassWord([FromBody] ModifyPassWordVO modifyPassWordVo)
     {
@@ -90,19 +112,6 @@ public class UserController
         return Results.Ok("修改密码成功");
     }
 
-    [HttpPost("deleteByName")]
-    public IResult DeleteByName([FromBody] string name)
-    {
-        var userPo = _db.User.FirstOrDefault(e=>e.name==name);
-        if (userPo==null)
-        {
-            return Results.Problem("用户不存在");
-        }
-
-        _db.User.Remove(userPo);
-        _db.SaveChanges();
-        return Results.Ok("删除用户成功");
-    }
 
     [HttpGet("queryAll")]
     public IResult Query()

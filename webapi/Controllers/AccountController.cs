@@ -4,21 +4,23 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi.model.vo;
+using webapi.util;
 
 namespace webapi.Controllers;
 
 [Route("account")]
-[EnableCors("aaa")]
-// [MinimumAgeAuthorize(10)]
 public class AccountController : Controller
 {
     private readonly AppDbContext _db;
+    
+    private static IHashPassword hashPassword = new SHA512HashPassword();
+
 
     public AccountController(AppDbContext db)
     {
         _db = db;
     }
-
+    
 
     [HttpPost("login")]
     public IResult login([FromBody] UserLoginVo userLoginVo)
@@ -26,12 +28,18 @@ public class AccountController : Controller
         var loginVoInDb = (from userPo in _db.User
             where userPo.name == userLoginVo.Name
             select new UserLoginVo { Name = userPo.name, Passwd = userPo.passwd }).FirstOrDefault();
-        ;
-        if (loginVoInDb == null || loginVoInDb.Passwd != userLoginVo.Passwd) return Results.BadRequest("用户不存在或密码错误");
 
-        var po = _db.User.Where(e => e.name == userLoginVo.Name).Include(e => e.RolePos).First();
+        if (loginVoInDb == null || !hashPassword.Validate(userLoginVo.Passwd,loginVoInDb.Passwd) )
+        {
+            return Results.BadRequest("用户不存在或密码错误");
+        }
+
+        var poList = _db.User.Where(e => e.name == userLoginVo.Name).Include(e => e.RolePos).First();
         var identity = new ClaimsIdentity("Basic");
-        foreach (var rolePo in po.RolePos) identity.AddClaim(new Claim("Role", rolePo.name));
+        foreach (var rolePo in poList.RolePos)
+        {
+            identity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, rolePo.name));
+        }
         HttpContext.SignInAsync(new ClaimsPrincipal(identity));
         return Results.Ok("登入成功");
     }

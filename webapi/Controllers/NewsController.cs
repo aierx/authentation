@@ -13,7 +13,6 @@ public class NewsController
         _db = db;
     }
 
-
     [HttpPost("save")]
     public IResult save([FromBody]NewsVo newsVo)
     {
@@ -26,11 +25,8 @@ public class NewsController
             attr2 = newsVo.attr2,
             attr3 = newsVo.attr3,
         };
-
         _db.News.Add(newsPo);
         _db.SaveChanges();
-
         return Results.Ok("ok");
-
     }
 }

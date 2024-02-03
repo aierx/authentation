@@ -25,7 +25,6 @@ public class ResourceController
     public List<ResourcePo> Query()
     {
         return null;
-
     }
 
     [HttpGet("queryByName")]

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace webapi.Controllers;
 
 [Route("content")]
-[EnableCors("aaa")]
 public class ContentController : Controller
 {
     private AppDbContext _db;
