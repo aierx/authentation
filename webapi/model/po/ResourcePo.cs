@@ -4,10 +4,11 @@ namespace webapi.model.po;
 
 public class ResourcePo : EntityPo
 {
-    public string fileName { get; set; }
+    public string fileOrginname { get; set; }
+    
+    public string fileupName { get; set; }
 
-    public string suffix { set; get; }
-    
-    public string type { set; get; }
-    
+    public string contentType { set; get; }
+
+    public string fileExtention { set; get; }
 }

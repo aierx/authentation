@@ -119,19 +119,23 @@ namespace webapi.Migrations
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
-                    b.Property<string>("fileName")
+                    b.Property<string>("contentType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("fileExtention")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("fileOrginname")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("fileupName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("modifer")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("suffix")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("type")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
