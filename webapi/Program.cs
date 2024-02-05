@@ -29,7 +29,6 @@ public class Program
         //     {
         //         builder.WithOrigins("http://127.0.0.1", "http://localhost")
         //             .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-        //         ;
         //     });
         // });
         // builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
@@ -48,6 +47,10 @@ public class Program
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         }).AddCookie(options =>
         {
+            // options.ExpireTimeSpan = TimeSpan.FromMinutes(120); // 有效期1小时
+            // options.Cookie.Expiration=TimeSpan.FromMinutes(24 * 60); 
+            options.Cookie.MaxAge = TimeSpan.FromMinutes(24 * 60); // 有效期1小时
+            options.Cookie.HttpOnly = false;
             options.ForwardForbid = "auth";
             options.ForwardChallenge = "auth";
         });
