@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using webapi.model.po;
+using webapi.model.vo;
 using webapi.util;
 using MediaTypeHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 
@@ -77,9 +78,29 @@ public class FileController
         string path = directory + resourcePo.fileupName;
         var bytes = File.ReadAllBytes(path);
         var actionresult = new FileContentResult(bytes, new MediaTypeHeaderValue(resourcePo.contentType));
+
+
+        actionresult.EnableRangeProcessing = true;
         //设定文件名称
         // actionresult.FileDownloadName = filename + "." + resourcePo.fileExtention;
 
         return actionresult;
+    }
+
+    [HttpGet("queryAll")]
+    public List<ResourceVo> query()
+    {
+        var resourcePos = _db.Resource.ToList();
+        var results = resourcePos.Select(e =>
+        {
+            var type = e.contentType.Split("/").FirstOrDefault("null");
+            return new ResourceVo()
+            {
+                Name = e.fileOrginname,
+                Type = type
+            };
+        }).ToList();
+
+        return results;
     }
 }
