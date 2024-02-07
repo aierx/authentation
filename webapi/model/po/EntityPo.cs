@@ -17,4 +17,6 @@ public class EntityPo
     [JsonIgnore] public string? Creator { get; set; }
 
     [JsonIgnore] public string? modifer { get; set; }
+    
+    public bool? isDelete { get; set; }
 }

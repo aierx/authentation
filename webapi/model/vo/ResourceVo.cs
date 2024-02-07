@@ -6,4 +6,7 @@ public class ResourceVo
 
     public string Type { get; set; }
 
+    public string Tag { get; set; }
+    
+    public int? Sort { get; set; }
 }

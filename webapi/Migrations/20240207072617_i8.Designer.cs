@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webapi;
 
@@ -10,9 +11,10 @@ using webapi;
 namespace webapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240207072617_i8")]
+    partial class i8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,9 +90,6 @@ namespace webapi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<bool?>("isDelete")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("modifer")
                         .HasColumnType("longtext");
 
@@ -145,9 +144,6 @@ namespace webapi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<bool?>("isDelete")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("modifer")
                         .HasColumnType("longtext");
 
@@ -176,9 +172,6 @@ namespace webapi.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<bool?>("isDelete")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("modifer")
                         .HasColumnType("longtext");
@@ -214,9 +207,6 @@ namespace webapi.Migrations
                     b.Property<string>("descroption")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<bool?>("isDelete")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("modifer")
                         .HasColumnType("longtext");
@@ -268,9 +258,6 @@ namespace webapi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<bool?>("isDelete")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("modifer")
                         .HasColumnType("longtext");
 
@@ -301,9 +288,6 @@ namespace webapi.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<bool?>("isDelete")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("modifer")
                         .HasColumnType("longtext");
