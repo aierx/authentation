@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc;
 using webapi.model.po;
 using webapi.util;
+using MediaTypeHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 
 namespace webapi.Controllers;
 
@@ -63,8 +65,8 @@ public class FileController
         return Results.Ok("上传成功!");
     }
 
-    [HttpGet("download")]
-    public async Task<FileStreamResult> download([FromQuery]string filename)
+    [HttpGet("download/{filename}")]
+    public async Task<FileContentResult>  download(string filename)
     {
         var resourcePo = _db.Resource.OrderByDescending(e=>e.CreateTime).FirstOrDefault(e => e.fileOrginname == filename);
         if (resourcePo==null)
@@ -73,11 +75,11 @@ public class FileController
         }
 
         string path = directory + resourcePo.fileupName;
-        var stream = File.Open(path,FileMode.Open);
-        //设定文件类型
-        var actionresult = new FileStreamResult(stream, new MediaTypeHeaderValue("image/png"));
+        var bytes = File.ReadAllBytes(path);
+        var actionresult = new FileContentResult(bytes, new MediaTypeHeaderValue(resourcePo.contentType));
         //设定文件名称
-        actionresult.FileDownloadName = filename+"."+resourcePo.fileExtention;
+        // actionresult.FileDownloadName = filename + "." + resourcePo.fileExtention;
+
         return actionresult;
     }
 }
