@@ -142,7 +142,7 @@ public class FileController
         return results;
     }
 
-    [HttpPost("sort")]
+    [HttpPost("modidy")]
     public IResult Modify([FromBody]ModifyResourceVo req)
     {
         var po = _db.Resource.FirstOrDefault(e => e.fileOrginname == req.name && e.Tag == req.tag);
