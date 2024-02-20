@@ -8,13 +8,13 @@ public class SpuPo : EntityPo
     
     public long price { get; set; }
 
-    public List< SpuTypePo> spuTypeList { get; set; }
+    public List< SpuTypePo>? spuTypeList { get; set; }
 
-    public Dictionary<string, string> descroption { get; set; }
+    public Dictionary<string, string>? descroption { get; set; }
     
-    private string attr1 { set; get; }
+    public string? attr1 { set; get; }
     
-    private string attr2 { set; get; }
+    public string? attr2 { set; get; }
     
-    private string attr3 { set; get; }
+    public string? attr3 { set; get; }
 }

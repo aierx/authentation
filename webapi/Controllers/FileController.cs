@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using webapi.model.po;
 using webapi.model.vo;
@@ -9,6 +10,7 @@ using MediaTypeHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 namespace webapi.Controllers;
 
 [Route("file")]
+[Authorize]
 public class FileController
 {
     private AppDbContext _db;

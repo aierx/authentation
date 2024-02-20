@@ -12,7 +12,7 @@ namespace webapi.Controllers;
 public class AccountController : Controller
 {
     private readonly AppDbContext _db;
-    
+
     private static IHashPassword hashPassword = new SHA512HashPassword();
 
 
@@ -20,7 +20,6 @@ public class AccountController : Controller
     {
         _db = db;
     }
-    
 
     [HttpPost("login")]
     public IResult login([FromBody] UserLoginVo userLoginVo)
@@ -29,7 +28,7 @@ public class AccountController : Controller
             where userPo.name == userLoginVo.Name
             select new UserLoginVo { Name = userPo.name, Passwd = userPo.passwd }).FirstOrDefault();
 
-        if (loginVoInDb == null || !hashPassword.Validate(userLoginVo.Passwd,loginVoInDb.Passwd) )
+        if (loginVoInDb == null || !hashPassword.Validate(userLoginVo.Passwd, loginVoInDb.Passwd))
         {
             return Results.BadRequest("用户不存在或密码错误");
         }
@@ -40,8 +39,14 @@ public class AccountController : Controller
         {
             identity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, rolePo.name));
         }
+
         HttpContext.SignInAsync(new ClaimsPrincipal(identity));
-        return Results.Ok("登入成功");
+
+        return Results.Ok(new
+        {
+            token = Guid.NewGuid(),
+            message = "登入成功"
+        });
     }
 
     [HttpPost("logout")]

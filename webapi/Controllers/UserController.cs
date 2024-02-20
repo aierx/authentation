@@ -9,7 +9,7 @@ using webapi.util;
 namespace webapi.Controllers;
 
 [Route("user")]
-[Authorize]
+[Authorize(Roles = "admin")]
 public class UserController
 {
     private readonly AppDbContext _db;

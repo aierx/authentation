@@ -8,7 +8,6 @@ using webapi.model.vo;
 namespace webapi.Controllers;
 
 [Route("role")]
-[EnableCors("aaa")]
 [Authorize(Roles = "admin")]
 public class RoleController
 {
